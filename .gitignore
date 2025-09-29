@@ -1,0 +1,16 @@
+# Virtual environment
+venv/
+__pycache__/
+*.pyc
+
+# OS stuff
+.DS_Store
+Thumbs.db
+
+# Local files you don’t want in git
+data/files/*
+!data/files/.gitkeep
+
+# Secrets
+.env
+config.yaml

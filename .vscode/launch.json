@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Greanium OS",
+      "type": "python",
+      "request": "launch",
+      "module": "backend.app",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "FLASK_ENV": "development"
+      },
+      "postDebugTask": "open-browser"
+    }
+  ]
+}

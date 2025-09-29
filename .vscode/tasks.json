@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "open-browser",
+      "type": "shell",
+      "command": "${workspaceFolder}\\venv\\Scripts\\activate && python -m webbrowser -t http://127.0.0.1:5000",
+      "windows": {
+        "command": "${workspaceFolder}\\venv\\Scripts\\activate && python -m webbrowser -t http://127.0.0.1:5000"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
