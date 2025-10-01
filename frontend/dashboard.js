@@ -1,7 +1,7 @@
 function runIntro() {
   const textEl = document.getElementById("intro-text");
 
-  const msg = "Welcome, Cormac Greaney // Greanium OS v1.0 initializing...";
+  const msg = "Welcome, Cormac Greaney // Greanium OS v1.1 initializing...";
   let i = 0;
 
   function typeWriter() {
