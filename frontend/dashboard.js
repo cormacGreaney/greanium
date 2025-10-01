@@ -80,17 +80,59 @@ async function init(){
   });
 }
 
-function runCmd(cmd){
+async function runCmd(cmd){
   if(!cmd) return;
   const parts = cmd.split(/\s+/);
+
+  // AI command
+  if(parts[0].toLowerCase() === "ai"){
+    const query = parts.slice(1).join(" ");
+    if(!query){
+      addOutput("Usage: ai <your question>");
+      return;
+    }
+
+    addOutput("> " + cmd); // show what the user typed
+
+    try {
+      const res = await fetch("/ai", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({prompt: query})
+      });
+      const data = await res.json();
+      if(data.reply){
+        addOutput("Greanium AI: " + data.reply);
+      } else {
+        addOutput("AI error: " + (data.error || "Unknown error"));
+      }
+    } catch(err){
+      addOutput("AI connection error: " + err.message);
+    }
+    return;
+  }
+
+  // Existing 'open' command
   if(parts[0].toLowerCase() === 'open' && parts[1]){
     const name = slug(parts.slice(1).join(' '));
     if(window._linkMap && window._linkMap.has(name)){
+      addOutput("> " + cmd);
       window.open(window._linkMap.get(name).url, '_blank');
+      addOutput("Opened link: " + parts.slice(1).join(' '));
       return;
     }
-    alert('No link matched: ' + parts.slice(1).join(' '));
+    addOutput("No link matched: " + parts.slice(1).join(' '));
     return;
   }
-  alert('Unknown command: ' + cmd);
+
+  // Unknown command
+  addOutput("Unknown command: " + cmd);
 }
+
+function addOutput(text){
+  const out = document.createElement("div");
+  out.textContent = text;
+  document.getElementById("terminal-output").appendChild(out);
+  out.scrollIntoView();
+}
+
