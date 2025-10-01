@@ -42,7 +42,7 @@ def ai_chat():
 
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": """You are the Greanium AI, the built-in intelligence of the Greanium OS.  
 Greanium is a personal operating system created by Cormac Greaney.  
