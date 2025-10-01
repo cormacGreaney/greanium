@@ -95,7 +95,7 @@ async function runCmd(cmd){
     addOutput("> " + cmd); // show what the user typed
 
     try {
-      const res = await fetch("/Greanium", {
+      const res = await fetch("/ai", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({prompt: query})
