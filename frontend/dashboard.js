@@ -587,17 +587,23 @@ async function runCmd(cmd){
 
   // Help command
   if(cmdName === "help" || cmdName === "?"){
-    addOutput(`Commands:
-  help           - Show this help
-  clear          - Clear terminal
-  open <name>    - Open link
-  projects       - List projects
-  skills         - Show skills
-  about          - Show bio
-  portfolio      - Portfolio overview
-  version        - System version
-  ai <question>  - Chat with AI
-  tab <name>     - Switch tab`);
+    addOutput("Available Commands:");
+    addOutput("");
+    addOutput("help              Shows this help message");
+    addOutput("clear, cls        Clears the terminal");
+    addOutput("open <name>       Opens a link by name");
+    addOutput("projects          Lists all projects");
+    addOutput("skills            Displays skills overview");
+    addOutput("about             Shows bio information");
+    addOutput("portfolio         Opens portfolio overview");
+    addOutput("version, ver      Shows system version");
+    addOutput("ai <question>     Chat with Greanium AI");
+    addOutput("tab <name>        Switches to specified tab");
+    addOutput("resume, cv        Downloads CV/Resume");
+    addOutput("contact           Opens contact form");
+    addOutput("github            Shows GitHub statistics");
+    addOutput("");
+    addOutput("Use arrow keys (↑/↓) for command history.");
     return;
   }
 
