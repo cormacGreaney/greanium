@@ -87,23 +87,47 @@ async function loadPortfolio() {
   }
 }
 
-function renderProjects(projects) {
+let allProjects = [];
+let filteredProjects = [];
+
+function renderProjects(projects, filterTech = '', searchTerm = '') {
   const grid = document.getElementById('projects-grid');
   if (!grid) return;
   
+  allProjects = projects;
+  
+  // Filter projects
+  filteredProjects = projects.filter(project => {
+    const matchesTech = !filterTech || (project.tech || []).some(t => 
+      t.toLowerCase().includes(filterTech.toLowerCase())
+    );
+    const matchesSearch = !searchTerm || 
+      project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (project.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (project.tech || []).some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    return matchesTech && matchesSearch;
+  });
+  
   grid.innerHTML = '';
   
-  projects.forEach(project => {
+  if (filteredProjects.length === 0) {
+    grid.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px">No projects found matching your criteria.</p>';
+    return;
+  }
+  
+  filteredProjects.forEach(project => {
     const card = document.createElement('div');
     card.className = 'project-card';
+    card.style.cursor = 'pointer';
     
     const techTags = (project.tech || []).map(t => 
       `<span class="tech-tag">${t}</span>`
     ).join('');
     
     const links = [];
-    if (project.url) links.push(`<a href="${project.url}" target="_blank">🌐 Live</a>`);
-    if (project.github) links.push(`<a href="${project.github}" target="_blank">💻 Code</a>`);
+    if (project.url) links.push(`<a href="${project.url}" target="_blank" onclick="event.stopPropagation()">🌐 Live</a>`);
+    if (project.github) links.push(`<a href="${project.github}" target="_blank" onclick="event.stopPropagation()">💻 Code</a>`);
     
     card.innerHTML = `
       <h3>${project.name}</h3>
@@ -112,8 +136,86 @@ function renderProjects(projects) {
       ${links.length > 0 ? `<div class="project-links">${links.join('')}</div>` : ''}
     `;
     
+    card.addEventListener('click', () => showProjectDetail(project));
+    
     grid.appendChild(card);
   });
+  
+  // Update filter dropdown with unique tech
+  updateTechFilter(projects);
+}
+
+function updateTechFilter(projects) {
+  const filterSelect = document.getElementById('project-filter');
+  if (!filterSelect) return;
+  
+  const allTech = new Set();
+  projects.forEach(p => {
+    (p.tech || []).forEach(t => allTech.add(t));
+  });
+  
+  // Clear existing options (except "All Technologies")
+  while (filterSelect.children.length > 1) {
+    filterSelect.removeChild(filterSelect.lastChild);
+  }
+  
+  Array.from(allTech).sort().forEach(tech => {
+    const option = document.createElement('option');
+    option.value = tech;
+    option.textContent = tech;
+    filterSelect.appendChild(option);
+  });
+}
+
+function showProjectDetail(project) {
+  // Create modal overlay
+  const modal = document.createElement('div');
+  modal.className = 'project-modal';
+  modal.innerHTML = `
+    <div class="project-modal-content">
+      <div class="project-modal-header">
+        <h2>${project.name}</h2>
+        <button class="project-modal-close" onclick="this.closest('.project-modal').remove()">×</button>
+      </div>
+      <div class="project-modal-body">
+        <div class="project-modal-description">
+          <h3>Description</h3>
+          <p>${project.description || 'No description available.'}</p>
+        </div>
+        ${project.tech && project.tech.length > 0 ? `
+        <div class="project-modal-tech">
+          <h3>Technologies</h3>
+          <div class="project-tech">${project.tech.map(t => `<span class="tech-tag">${t}</span>`).join('')}</div>
+        </div>
+        ` : ''}
+        ${(project.url || project.github) ? `
+        <div class="project-modal-links">
+          <h3>Links</h3>
+          <div class="project-links">
+            ${project.url ? `<a href="${project.url}" target="_blank">🌐 View Live Demo</a>` : ''}
+            ${project.github ? `<a href="${project.github}" target="_blank">💻 View on GitHub</a>` : ''}
+          </div>
+        </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Close on backdrop click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+  
+  // Close on ESC key
+  const escHandler = (e) => {
+    if (e.key === 'Escape') {
+      modal.remove();
+      document.removeEventListener('keydown', escHandler);
+    }
+  };
+  document.addEventListener('keydown', escHandler);
 }
 
 function renderAbout(bio) {
@@ -159,8 +261,10 @@ function renderAbout(bio) {
       <h3>Contact</h3>
       <div class="contact-info">
         ${bio.email ? `<a href="mailto:${bio.email}">📧 ${bio.email}</a>` : ''}
+        <a href="tel:+353838325683">📱 +353 83 832 5683</a>
         <a href="https://www.linkedin.com/in/cormac-greaney-46277425a/" target="_blank">💼 LinkedIn</a>
         <a href="https://github.com/cormacGreaney" target="_blank">💻 GitHub</a>
+        <a href="https://instagram.com/cormacgreaney18" target="_blank">📷 Instagram</a>
       </div>
     </div>
   `;
@@ -197,23 +301,38 @@ function renderPortfolioOverview(portfolio) {
   const bio = portfolio.bio || {};
   const projectCount = (portfolio.projects || []).length;
   const featuredCount = (portfolio.projects || []).filter(p => p.featured).length;
+  const skillCount = (bio.skills || []).length;
   
   overview.innerHTML = `
-    <div style="line-height:1.8">
-      <p><strong style="color:var(--accent)">${bio.name || 'Cormac Greaney'}</strong></p>
-      <p style="color:var(--muted)">${bio.tagline || 'Developer & Creator'}</p>
-      <p style="margin-top:16px;font-size:13px">${bio.about || 'Personal portfolio and operating system.'}</p>
+    <div class="portfolio-overview-content">
+      <div class="bio-header">
+        <h3 style="color:var(--accent);font-size:24px;margin:0 0 8px 0;text-shadow:0 0 10px rgba(55,255,90,0.3)">${bio.name || 'Cormac Greaney'}</h3>
+        <p style="color:var(--muted);font-size:16px;margin:0 0 24px 0">${bio.tagline || 'Developer & Creator'}</p>
+      </div>
       
-      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--glass)">
-        <div style="display:flex;gap:24px;font-size:12px;color:var(--muted)">
-          <div><strong style="color:var(--accent)">${projectCount}</strong> Projects</div>
-          <div><strong style="color:var(--accent)">${featuredCount}</strong> Featured</div>
-          <div><strong style="color:var(--accent)">${(bio.skills || []).length}</strong> Skills</div>
+      <div class="bio-about" style="margin-bottom:32px;padding:20px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid var(--glass)">
+        <p style="font-size:14px;line-height:1.8;margin:0;color:var(--muted)">${bio.about || 'Personal portfolio and operating system.'}</p>
+      </div>
+      
+      <div class="stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px">
+        <div style="padding:20px;background:rgba(55,255,90,0.05);border-radius:8px;border:1px solid var(--border);text-align:center">
+          <div style="font-size:32px;font-weight:700;color:var(--accent);margin-bottom:8px;text-shadow:0 0 10px rgba(55,255,90,0.3)">${projectCount}</div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Projects</div>
+        </div>
+        <div style="padding:20px;background:rgba(55,255,90,0.05);border-radius:8px;border:1px solid var(--border);text-align:center">
+          <div style="font-size:32px;font-weight:700;color:var(--accent);margin-bottom:8px;text-shadow:0 0 10px rgba(55,255,90,0.3)">${featuredCount}</div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Featured</div>
+        </div>
+        <div style="padding:20px;background:rgba(55,255,90,0.05);border-radius:8px;border:1px solid var(--border);text-align:center">
+          <div style="font-size:32px;font-weight:700;color:var(--accent);margin-bottom:8px;text-shadow:0 0 10px rgba(55,255,90,0.3)">${skillCount}</div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Skills</div>
         </div>
       </div>
       
-      <div style="margin-top:16px">
-        <p style="font-size:12px;color:var(--muted)">Type <code>projects</code> in the terminal to view all projects, or use the tabs above to navigate.</p>
+      <div style="padding:16px;background:rgba(0,0,0,0.2);border-radius:8px;border:1px solid var(--glass)">
+        <p style="font-size:13px;color:var(--muted);margin:0;line-height:1.8">
+          Type <code style="background:rgba(55,255,90,0.1);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:12px;border:1px solid var(--border)">projects</code> in the terminal to view all projects, or use the tabs above to navigate.
+        </p>
       </div>
     </div>
   `;
@@ -259,6 +378,17 @@ async function init(){
   
   // Load portfolio
   await loadPortfolio();
+  
+  // Load GitHub stats
+  await loadGitHubStats();
+  
+  // Initialize project filters
+  initProjectFilters();
+  
+  // Initialize contact form
+  initContactForm();
+  
+  // Instagram link is now always shown in renderAbout()
 
   // Initialize terminal
   initTerminal();
@@ -267,6 +397,140 @@ async function init(){
   setTimeout(() => {
     addOutput("Greanium OS v1.2 ready. Type 'help' for available commands.");
   }, 500);
+}
+
+async function loadGitHubStats() {
+  const githubContent = document.getElementById('github-content');
+  if (!githubContent) return;
+  
+  try {
+    const data = await fetchJSON('/github/stats');
+    
+    githubContent.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:16px;margin-bottom:24px">
+        <div style="padding:16px;background:rgba(55,255,90,0.05);border-radius:8px;border:1px solid var(--border);text-align:center">
+          <div style="font-size:24px;font-weight:700;color:var(--accent);margin-bottom:4px">${data.stats.repositories}</div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase">Repos</div>
+        </div>
+        <div style="padding:16px;background:rgba(55,255,90,0.05);border-radius:8px;border:1px solid var(--border);text-align:center">
+          <div style="font-size:24px;font-weight:700;color:var(--accent);margin-bottom:4px">${data.stats.stars}</div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase">Stars</div>
+        </div>
+        <div style="padding:16px;background:rgba(55,255,90,0.05);border-radius:8px;border:1px solid var(--border);text-align:center">
+          <div style="font-size:24px;font-weight:700;color:var(--accent);margin-bottom:4px">${data.stats.followers}</div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase">Followers</div>
+        </div>
+      </div>
+      
+      ${data.top_languages && data.top_languages.length > 0 ? `
+      <div style="margin-bottom:24px">
+        <h3 style="color:var(--accent);font-size:14px;margin-bottom:12px">Top Languages</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          ${data.top_languages.map(lang => `<span class="skill-tag">${lang}</span>`).join('')}
+        </div>
+      </div>
+      ` : ''}
+      
+      ${data.recent_repos && data.recent_repos.length > 0 ? `
+      <div>
+        <h3 style="color:var(--accent);font-size:14px;margin-bottom:12px">Recent Repositories</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${data.recent_repos.map(repo => `
+            <div style="padding:12px;background:rgba(255,255,255,0.02);border:1px solid var(--glass);border-radius:6px">
+              <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px">
+                <a href="${repo.url}" target="_blank" style="color:var(--accent);font-weight:600;font-size:13px">${repo.name}</a>
+                <span style="font-size:11px;color:var(--muted)">⭐ ${repo.stars}</span>
+              </div>
+              ${repo.description ? `<p style="font-size:12px;color:var(--muted);margin:0">${repo.description}</p>` : ''}
+              ${repo.language ? `<span class="skill-tag" style="margin-top:8px;display:inline-block">${repo.language}</span>` : ''}
+            </div>
+          `).join('')}
+        </div>
+        <div style="margin-top:16px;text-align:center">
+          <a href="${data.profile_url}" target="_blank" style="color:var(--accent);font-size:13px">View All Repositories →</a>
+        </div>
+      </div>
+      ` : ''}
+    `;
+  } catch(e) {
+    console.error(e);
+    githubContent.innerHTML = '<p style="color:var(--muted)">GitHub data unavailable. Check configuration.</p>';
+  }
+}
+
+function initProjectFilters() {
+  const searchInput = document.getElementById('project-search');
+  const filterSelect = document.getElementById('project-filter');
+  
+  if (searchInput) {
+    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const filterTech = filterSelect ? filterSelect.value : '';
+        renderProjects(allProjects, filterTech, e.target.value);
+      }, 300);
+    });
+  }
+  
+  if (filterSelect) {
+    filterSelect.addEventListener('change', (e) => {
+      const searchTerm = searchInput ? searchInput.value : '';
+      renderProjects(allProjects, e.target.value, searchTerm);
+    });
+  }
+}
+
+function initContactForm() {
+  const form = document.getElementById('contact-form');
+  const messageDiv = document.getElementById('contact-message');
+  
+  if (!form || !messageDiv) return;
+  
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+      name: form.querySelector('[name="name"]').value,
+      email: form.querySelector('[name="email"]').value,
+      message: form.querySelector('[name="message"]').value
+    };
+    
+        messageDiv.style.display = 'block';
+        messageDiv.textContent = 'Sending...';
+        messageDiv.style.color = 'var(--muted)';
+        messageDiv.style.background = 'rgba(0,0,0,0.3)';
+        messageDiv.style.border = '1px solid var(--glass)';
+    
+    try {
+      const res = await fetch('/contact/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        messageDiv.textContent = data.message || 'Message sent successfully!';
+        messageDiv.style.color = 'var(--accent)';
+        messageDiv.style.background = 'rgba(55,255,90,0.1)';
+        messageDiv.style.border = '1px solid var(--border)';
+        form.reset();
+        
+        setTimeout(() => {
+          messageDiv.style.display = 'none';
+        }, 5000);
+      } else {
+        throw new Error(data.error || 'Failed to send message');
+      }
+    } catch(err) {
+      messageDiv.textContent = err.message || 'Failed to send message. Please try again.';
+      messageDiv.style.color = '#ff6b6b';
+      messageDiv.style.background = 'rgba(255,107,107,0.1)';
+      messageDiv.style.border = '1px solid rgba(255,107,107,0.3)';
+    }
+  });
 }
 
 function initTerminal() {
@@ -323,17 +587,17 @@ async function runCmd(cmd){
 
   // Help command
   if(cmdName === "help" || cmdName === "?"){
-    addOutput(`Available commands:
-  help, ?              - Show this help message
-  clear, cls           - Clear terminal
-  open <name>          - Open a link by name
-  projects             - List all projects
-  skills               - Show skills overview
-  about                - Show about information
-  portfolio            - Show portfolio overview
-  version, ver         - Show system version
-  ai <question>        - Chat with Greanium AI
-  tab <name>           - Switch to tab (dashboard/portfolio/projects/about)`);
+    addOutput(`Commands:
+  help           - Show this help
+  clear          - Clear terminal
+  open <name>    - Open link
+  projects       - List projects
+  skills         - Show skills
+  about          - Show bio
+  portfolio      - Portfolio overview
+  version        - System version
+  ai <question>  - Chat with AI
+  tab <name>     - Switch tab`);
     return;
   }
 
@@ -418,6 +682,37 @@ async function runCmd(cmd){
     const tabBtn = document.querySelector(`[data-tab="portfolio"]`);
     if (tabBtn) tabBtn.click();
     addOutput("Opening portfolio overview...");
+    return;
+  }
+
+  // Resume/CV command
+  if(cmdName === "resume" || cmdName === "cv"){
+    addOutput("Downloading CV/Resume...");
+    window.location.href = "/files/download/CV_Cormac_Greaney.md";
+    return;
+  }
+
+  // Contact command
+  if(cmdName === "contact"){
+    const tabBtn = document.querySelector(`[data-tab="about"]`);
+    if (tabBtn) tabBtn.click();
+    setTimeout(() => {
+      const contactForm = document.getElementById('contact-form');
+      if (contactForm) contactForm.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+    addOutput("Opening contact form...");
+    return;
+  }
+
+  // GitHub command
+  if(cmdName === "github"){
+    const tabBtn = document.querySelector(`[data-tab="about"]`);
+    if (tabBtn) tabBtn.click();
+    setTimeout(() => {
+      const githubContent = document.getElementById('github-content');
+      if (githubContent) githubContent.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+    addOutput("Showing GitHub stats...");
     return;
   }
 

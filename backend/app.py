@@ -3,6 +3,8 @@ from backend.routes.files import files_bp
 from backend.routes.links import links_bp
 from backend.routes.auth import auth_bp
 from backend.routes.portfolio import portfolio_bp
+from backend.routes.contact import contact_bp
+from backend.routes.github import github_bp
 from flask import request
 import openai 
 import os
@@ -15,6 +17,8 @@ app.register_blueprint(files_bp, url_prefix="/files")
 app.register_blueprint(links_bp, url_prefix="/links")
 app.register_blueprint(auth_bp, url_prefix="/auth")
 app.register_blueprint(portfolio_bp, url_prefix="/portfolio")
+app.register_blueprint(contact_bp, url_prefix="/contact")
+app.register_blueprint(github_bp, url_prefix="/github")
 
 # Serve frontend
 FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../frontend"))
