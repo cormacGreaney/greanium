@@ -5,7 +5,7 @@ let historyIndex = -1;
 function runIntro() {
   const textEl = document.getElementById("intro-text");
 
-  const msg = "Welcome, Cormac Greaney // Greanium OS v1.2 initializing...";
+  const msg = "Welcome, Cormac Greaney // Greanium OS v2.0 initializing...";
   let i = 0;
 
   function typeWriter() {
@@ -395,7 +395,7 @@ async function init(){
   
   // Add welcome message
   setTimeout(() => {
-    addOutput("Greanium OS v1.2 ready. Type 'help' for available commands.");
+    addOutput("Greanium OS v2.0 ready. Type 'help' for available commands.");
   }, 500);
 }
 
@@ -610,7 +610,7 @@ async function runCmd(cmd){
 
   // Version command
   if(cmdName === "version" || cmdName === "ver"){
-    addOutput("Greanium OS v1.2");
+    addOutput("Greanium OS v2.0");
     addOutput("Created by Cormac Greaney © 2025");
     return;
   }
