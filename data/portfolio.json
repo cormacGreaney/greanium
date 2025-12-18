@@ -1,0 +1,119 @@
+{
+  "bio": {
+    "name": "Cormac Greaney",
+    "tagline": "Developer & Creator",
+    "location": "Limerick, Ireland",
+    "email": "cormacgreaney17@gmail.com",
+    "about": "4th year Computer Systems student at University of Limerick, passionate about full-stack development, machine learning, and creating innovative web experiences. Creator of Greanium OS. Starting Masters in Artificial Intelligence & Machine Learning at UL in 2026.",
+    "skills": [
+      {"name": "Python", "category": "Backend"},
+      {"name": "JavaScript", "category": "Frontend"},
+      {"name": "Java", "category": "Backend"},
+      {"name": "TypeScript", "category": "Frontend"},
+      {"name": "Flask", "category": "Backend"},
+      {"name": "HTML/CSS", "category": "Frontend"},
+      {"name": "Machine Learning", "category": "AI/ML"},
+      {"name": "Neural Networks", "category": "AI/ML"},
+      {"name": "Deep Learning", "category": "AI/ML"},
+      {"name": "PyTorch", "category": "AI/ML"},
+      {"name": "Computer Vision", "category": "AI/ML"},
+      {"name": "Reinforcement Learning", "category": "AI/ML"},
+      {"name": "3D Modeling", "category": "Design"},
+      {"name": "Git", "category": "Tools"},
+      {"name": "Docker", "category": "Tools"}
+    ],
+    "experience": [
+      {
+        "title": "Co-op Software Developer",
+        "company": "Jaguar Land Rover (JLR)",
+        "period": "8 months (Co-op Placement)",
+        "description": "Work placement as part of university co-op program, gaining hands-on experience in software development within an automotive industry environment."
+      }
+    ],
+    "education": [
+      {
+        "degree": "BSc Computer Systems",
+        "institution": "University of Limerick",
+        "period": "2022 - 2026"
+      },
+      {
+        "degree": "MSc Artificial Intelligence & Machine Learning",
+        "institution": "University of Limerick",
+        "period": "2026 - 2027 (Upcoming)"
+      }
+    ]
+  },
+  "projects": [
+    {
+      "id": "greanium",
+      "name": "Greanium OS",
+      "description": "A personal web-based operating system interface combining portfolio, file management, and terminal functionality.",
+      "tech": ["Flask", "JavaScript", "HTML/CSS", "Python"],
+      "url": "https://your-greanium-url.com",
+      "github": "https://github.com/cormacGreaney/Greanium",
+      "image": null,
+      "featured": true
+    },
+    {
+      "id": "cheersnbeers",
+      "name": "Cheer's N' Beer's Web App",
+      "description": "A web application for beer enthusiasts.",
+      "tech": ["JavaScript", "HTML/CSS"],
+      "url": "https://cheersnbeers.great-site.net",
+      "github": null,
+      "image": null,
+      "featured": true
+    },
+    {
+      "id": "capitol",
+      "name": "3DS Max U.S. Capitol Building",
+      "description": "3D modeling and animation project of the U.S. Capitol Building.",
+      "tech": ["3DS Max", "3D Modeling", "Animation"],
+      "url": "https://youtu.be/QKPAg5fCE1A?si=9Mm8GhMeQNrT76PH",
+      "github": null,
+      "image": null,
+      "featured": false
+    },
+    {
+      "id": "dqnpong",
+      "name": "Deep Q-Network for Atari Pong",
+      "description": "Implementation of a Deep Q-Network (DQN) for Atari Pong using Gymnasium and Arcade Learning Environment (ALE). Part of University of Limerick CS4287 Neural Computing module. Trained an agent to master the classic Pong game through reinforcement learning.",
+      "tech": ["Python", "PyTorch", "Gymnasium", "Reinforcement Learning", "Deep Learning", "Neural Networks"],
+      "url": null,
+      "github": "https://github.com/cormacGreaney/Implementing-a-Deep-Q-Network-for-Atari-Pong-Using-Gymnasium-and-ALE",
+      "image": null,
+      "featured": true
+    },
+    {
+      "id": "imagesegmentation",
+      "name": "Image Segmentation with VGG16-based U-Net",
+      "description": "Image segmentation project using a VGG16-based U-Net architecture on the Oxford-IIIT Pet Dataset. Developed as part of CS4287 Neural Computing Assignment 1. Implemented convolutional neural networks for semantic segmentation tasks.",
+      "tech": ["Python", "PyTorch", "Computer Vision", "U-Net", "VGG16", "CNN", "Image Segmentation"],
+      "url": null,
+      "github": "https://github.com/cormacGreaney/Image-Segmentation-using-a-VGG16-based-U-Net-Architecture-on-the-Oxford-IIIT-Pet-Dataset-",
+      "image": null,
+      "featured": true
+    },
+    {
+      "id": "quizlive",
+      "name": "QuizLive",
+      "description": "Full-stack web application for hosting and participating in live quiz games. Built with Java backend and TypeScript frontend, featuring real-time interactions and game management capabilities.",
+      "tech": ["Java", "TypeScript", "HTML", "Docker", "Full-Stack", "Web Development"],
+      "url": null,
+      "github": "https://github.com/cormacGreaney/QuizLive",
+      "image": null,
+      "featured": true
+    }
+  ],
+  "blog": [
+    {
+      "id": "welcome",
+      "title": "Welcome to Greanium OS",
+      "date": "2025-01-01",
+      "excerpt": "Introducing my personal operating system interface...",
+      "content": "# Welcome to Greanium OS\n\nThis is my personal web-based operating system..."
+    }
+  ]
+}
+
+

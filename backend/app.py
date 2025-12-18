@@ -2,6 +2,7 @@ from flask import Flask, send_from_directory
 from backend.routes.files import files_bp
 from backend.routes.links import links_bp
 from backend.routes.auth import auth_bp
+from backend.routes.portfolio import portfolio_bp
 from flask import request
 import openai 
 import os
@@ -13,6 +14,7 @@ app = Flask(__name__)
 app.register_blueprint(files_bp, url_prefix="/files")
 app.register_blueprint(links_bp, url_prefix="/links")
 app.register_blueprint(auth_bp, url_prefix="/auth")
+app.register_blueprint(portfolio_bp, url_prefix="/portfolio")
 
 # Serve frontend
 FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../frontend"))
